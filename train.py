@@ -25,11 +25,9 @@ def loadQA():
     train_y = np.load('./data/idx_a.npy', mmap_mode='r')
     return train_x, train_y
 
-
-def seq2seq(encoder_inputs, decoder_inputs, cell, num_encoder_symbols, num_decoder_symbols, embedding_size):
-    encoder_inputs = tf.unstack(encoder_inputs, axis=0)
-    decoder_inputs = tf.unstack(decoder_inputs, axis=0)
-    results, states = tf.contrib.legacy_seq2seq.embedding_rnn_seq2seq(
+encoder_inputs = tf.unstack(encoder_inputs, axis=0)
+decoder_inputs = tf.unstack(decoder_inputs, axis=0)
+results, states = tf.contrib.legacy_seq2seq.embedding_rnn_seq2seq(
         encoder_inputs,
         decoder_inputs,
         cell,
@@ -41,10 +39,6 @@ def seq2seq(encoder_inputs, decoder_inputs, cell, num_encoder_symbols, num_decod
         dtype=None,
         scope=None
     )
-    return results
-
-
-results = seq2seq(encoder_inputs, decoder_inputs, cell, num_encoder_symbols, num_decoder_symbols, embedding_size)
 logits = tf.stack(results, axis=0)
 loss = tf.contrib.seq2seq.sequence_loss(logits, targets=targets, weights=weights)
 pred = tf.argmax(logits, 2)
